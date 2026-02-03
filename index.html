@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearX ESRGAN | High-Fidelity Satellite Enhancement</title>
+    <meta name="description"
+        content="Next-generation ESRGAN model for satellite imagery super-resolution. Enhance any tile with 4x resolution and industry-leading PSNR/SSIM metrics.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="light-mode">
+    <!-- Floating Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="gradient-text">ClearX</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#hero">Overview</a></li>
+                <li><a href="#compare">Technology</a></li>
+                <li><a href="#metrics">Metrics</a></li>
+                <li><a href="#test">Try Model</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button id="theme-toggle" class="icon-btn">
+                    <i data-lucide="moon" id="theme-icon"></i>
+                </button>
+                <a href="#test" class="btn btn-primary">Try Model</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="fade-in">See Earth <br><span class="gradient-text">Clearly.</span></h1>
+                    <p class="hero-subtitle fade-in-delayed">Leveraging ESRGAN with RRDB architecture to deliver 4x
+                        super-resolution for satellite data. Precision redefined for the next era of remote sensing.</p>
+                    <div class="hero-btns fade-in-delayed">
+                        <a href="#test" class="btn btn-primary">Try Our Model</a>
+                        <a href="#metrics" class="btn btn-secondary">View Benchmarks</a>
+                    </div>
+                </div>
+                <div class="hero-visual fade-in">
+                    <div class="image-stack">
+                        <div class="stack-item stack-item-1"></div>
+                        <div class="stack-item stack-item-2"></div>
+                        <div class="stack-item stack-item-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before/After Comparison -->
+        <section id="compare" class="comparison">
+            <div class="container">
+                <div class="section-header center">
+                    <h2>Advanced <span class="gradient-text">Super-Resolution</span></h2>
+                    <p>Drag the slider to compare standard bicubic interpolation with our ESRGAN model.</p>
+                </div>
+
+                <div class="slider-container">
+                    <div class="image-comparison">
+                        <img class="image-after" src="assets/city_hr.png" alt="ESRGAN Output">
+                        <div class="img-wrapper-before">
+                            <img class="image-before" src="assets/city_hr.png" alt="Bicubic Input"
+                                style="filter: blur(8px) contrast(0.9);">
+                        </div>
+                        <div class="slider-divider">
+                            <div class="slider-handle">
+                                <i data-lucide="move-horizontal"></i>
+                            </div>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="slider" id="compare-slider">
+                    </div>
+                    <div class="comparison-labels">
+                        <span>Slide to experience the ClearX Super-Resolution advantage.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Metrics Section -->
+        <section id="metrics" class="metrics">
+            <div class="container">
+                <div class="metrics-grid">
+                    <div class="metric-card glass">
+                        <div class="metric-icon"><i data-lucide="zap"></i></div>
+                        <div class="metric-value">32.86 <span class="unit">dB</span></div>
+                        <div class="metric-label">Peak Signal-to-Noise Ratio (PSNR)</div>
+                        <p class="metric-desc">Significant improvement over standard upscaling methods, ensuring minimal
+                            signal degradation.</p>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-icon"><i data-lucide="layers"></i></div>
+                        <div class="metric-value">0.9336</div>
+                        <div class="metric-label">Structural Similarity (SSIM)</div>
+                        <p class="metric-desc">High structural integrity preserved across building edges and complex
+                            coastal textures.</p>
+                    </div>
+                    <div class="metric-card glass">
+                        <div class="metric-icon"><i data-lucide="cpu"></i></div>
+                        <div class="metric-value">RRDB</div>
+                        <div class="metric-label">Residual Dense Blocks</div>
+                        <p class="metric-desc">16 Residual-in-Residual Dense Blocks enable deep feature extraction
+                            without vanishing gradients.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Testing Section -->
+        <section id="test" class="model-test">
+            <div class="container">
+                <div class="section-header center">
+                    <h2>Try Our <span class="gradient-text">Model</span></h2>
+                    <p>Upload your own satellite tile and see the ESRGAN enhancement in real-time.</p>
+                </div>
+
+                <div class="test-container glass">
+                    <div class="upload-area" id="drop-zone">
+                        <div class="upload-content">
+                            <i data-lucide="upload-cloud" id="upload-icon"></i>
+                            <p>Drag and drop your image here or <span>browse</span></p>
+                            <span class="upload-hint">Supports PNG, JPG (Max 5MB)</span>
+                        </div>
+                        <input type="file" id="file-input" hidden accept="image/*">
+                    </div>
+
+                    <div class="testing-grid" id="testing-grid" style="display: none;">
+                        <div class="test-item">
+                            <span class="test-label">Input Image (Low Res)</span>
+                            <div class="image-preview glass" id="input-preview"></div>
+                        </div>
+                        <div class="test-item">
+                            <span class="test-label">ClearX Output (4x SR)</span>
+                            <div class="image-preview glass" id="output-preview">
+                                <div class="loader-container" id="model-loader">
+                                    <div class="spinner"></div>
+                                    <p>Processing via RRDB...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-actions" id="test-actions" style="display: none;">
+                        <button class="btn btn-primary" id="reset-test">Test Another Image</button>
+                        <a href="#" class="btn btn-secondary" id="download-result">Download Result</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>Built for the future of Earth Observation.</p>
+                <div class="social-links">
+                    <a href="#"><i data-lucide="twitter"></i></a>
+                    <a href="#"><i data-lucide="github"></i></a>
+                    <a href="#"><i data-lucide="linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <script src="script.js"></script>
+    <script>
+        console.log('ClearX: Initializing Lucide icons.');
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
