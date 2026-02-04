@@ -110,56 +110,72 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Blob([u8arr], { type: mime });
     };
 
-    const handleFile = (file) => {
+    const handleFile = async (file) => {
         if (!file || !file.type.startsWith('image/')) {
             console.error('Model Testing: Invalid file type. Please upload an image.');
             return;
         }
 
         console.log(`Model Testing: Handling file "${file.name}" (${file.size} bytes).`);
+
+        // Show local preview of input
         const reader = new FileReader();
         reader.onload = (e) => {
             const imgSrc = e.target.result;
-            console.log('Model Testing: File read complete. Starting simulation.');
-
             dropZone.style.display = 'none';
             testingGrid.style.display = 'grid';
-
             inputPreview.style.backgroundImage = `url(${imgSrc})`;
-            inputPreview.style.filter = 'blur(4px) contrast(0.8)';
-
+            inputPreview.style.filter = 'none'; // Remove simulated blur
             modelLoader.style.display = 'block';
             outputPreview.style.backgroundImage = 'none';
-
-            setTimeout(() => {
-                console.log('Model Testing: Simulation complete. Displaying results.');
-                modelLoader.style.display = 'none';
-                outputPreview.style.backgroundImage = `url(${imgSrc})`;
-                outputPreview.style.filter = 'contrast(1.1) brightness(1.05)';
-                testActions.style.display = 'flex';
-
-                // Robust Download Logic
-                processedImageUrl = imgSrc;
-                if (downloadBtn) {
-                    console.log('Model Testing: Update download button link.');
-                    downloadBtn.onclick = (event) => {
-                        event.preventDefault();
-                        console.log('Model Testing: User clicked download.');
-                        const blob = dataURLtoBlob(processedImageUrl);
-                        const blobUrl = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = 'ClearX_enhanced_satellite.png';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(blobUrl);
-                        console.log('Model Testing: Download initiated via Blob URL.');
-                    };
-                }
-            }, 2500);
+            testActions.style.display = 'none';
         };
         reader.readAsDataURL(file);
+
+        // Actual API Call
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            console.log('Model Testing: Sending request to backend...');
+            const response = await fetch('http://localhost:8000/enhance', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.statusText}`);
+            }
+
+            const blob = await response.blob();
+            const resultUrl = URL.createObjectURL(blob);
+
+            console.log('Model Testing: Received result from backend.');
+            modelLoader.style.display = 'none';
+            outputPreview.style.backgroundImage = `url(${resultUrl})`;
+            outputPreview.style.filter = 'none'; // Ensure no filtered appearance
+            testActions.style.display = 'flex';
+
+            processedImageUrl = resultUrl;
+
+            if (downloadBtn) {
+                downloadBtn.onclick = (event) => {
+                    event.preventDefault();
+                    const link = document.createElement('a');
+                    link.href = resultUrl;
+                    link.download = 'ClearX_ESRGAN_Enhanced.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+            }
+        } catch (error) {
+            console.error('Model Testing: Enhancement failed:', error);
+            modelLoader.style.display = 'none';
+            alert('Model Enhancement failed. Please ensure the backend server is running.');
+            // Reset UI or show error state
+            resetBtn.click();
+        }
     };
 
     if (dropZone) {
