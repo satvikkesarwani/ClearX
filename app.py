@@ -74,7 +74,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+print(f"Using device: {device}")
 model = ESRGAN_Generator().to(device)
 
 # Load weights
@@ -92,18 +93,29 @@ except Exception as e:
 
 @app.post("/enhance")
 async def enhance_image(file: UploadFile = File(...)):
+    import time
+    start_total = time.time()
+    
     contents = await file.read()
     image = Image.open(io.BytesIO(contents)).convert("RGB")
     
+    print(f"--- Starting Enhancement for {file.filename} ---")
+    
     # Preprocessing
+    t0 = time.time()
     img_np = np.array(image)
     img_tensor = torch.tensor(img_np / 255.0).permute(2, 0, 1).float().unsqueeze(0).to(device)
+    print(f"Preprocessing took: {time.time() - t0:.2f}s")
     
     # Inference
+    t1 = time.time()
+    print("Running Model Inference (RRDB blocks)... this is the heavy part.")
     with torch.no_grad():
         sr_tensor = model(img_tensor)
+    print(f"Model Inference took: {time.time() - t1:.2f}s")
     
     # Postprocessing
+    t2 = time.time()
     sr_img = sr_tensor.squeeze().permute(1, 2, 0).cpu().numpy()
     sr_img = (sr_img * 255).clip(0, 255).astype(np.uint8)
     
@@ -112,7 +124,9 @@ async def enhance_image(file: UploadFile = File(...)):
     img_byte_arr = io.BytesIO()
     output_image.save(img_byte_arr, format='PNG')
     img_byte_arr = img_byte_arr.getvalue()
+    print(f"Postprocessing took: {time.time() - t2:.2f}s")
     
+    print(f"Total enhancement time: {time.time() - start_total:.2f}s")
     return Response(content=img_byte_arr, media_type="image/png")
 
 if __name__ == "__main__":

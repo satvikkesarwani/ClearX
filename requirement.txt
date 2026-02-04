@@ -1,0 +1,15 @@
+torch
+torchvision
+opencv-python
+numpy
+matplotlib
+earthengine-api
+geemap
+scikit-image
+tqdm
+jupyter
+fastapi
+uvicorn
+python-multipart
+pillown
+requests

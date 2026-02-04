@@ -136,18 +136,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('file', file);
 
+        const loaderText = modelLoader.querySelector('p');
+
         try {
+            if (loaderText) loaderText.innerText = 'Connecting to model...';
             console.log('Model Testing: Sending request to backend...');
+
             const response = await fetch('http://localhost:8000/enhance', {
                 method: 'POST',
                 body: formData
             });
+
+            if (loaderText) loaderText.innerText = 'Model is analyzing (RRDB blocks)... this may take a minute.';
 
             if (!response.ok) {
                 throw new Error(`Server error: ${response.statusText}`);
             }
 
             const blob = await response.blob();
+            if (loaderText) loaderText.innerText = 'Processing result...';
+
             const resultUrl = URL.createObjectURL(blob);
 
             console.log('Model Testing: Received result from backend.');
